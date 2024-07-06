@@ -95,29 +95,20 @@
 <div class="navbar">
     <img src="/images/logo.jpeg" alt="Gym Logo">
         <div>
-        <div class="navbar-item">
-            <a href="/index" class="navbar-item">Home</a>
-        </div>
-        <div class="navbar-item">
-            <a href="/about" class="navbar-item">About</a>
-        </div>
         <div class="navbar-item has-subnav">
             Item
             <div class="subnav">
                 <a href="/gymitem" class="subnav-item">Add Item</a>
-                <a href="/gymitems" class="subnav-item">View Items</a>
+                <a href="/gymitems" class="subnav-item">Manage Items</a>
             </div>
         </div>
         <div class="navbar-item has-subnav">
             Slot
             <div class="subnav">
-                <a href="/slotbooking" class="subnav-item">Slot Booking</a>
                 <a href="/slot" class="subnav-item">Add Slot</a>
-                <a href="/slots" class="subnav-item">View Slots</a>
+                <a href="/slots" class="subnav-item">Manage Slots</a>
             </div>
         </div>
-        <div class="navbar-item">Feedback</div>
-        <div class="navbar-item">Contact Us</div>
         <button class="logout-button" onclick="window.location.href='/logout'">Log Out</button>
     </div>
 </div>

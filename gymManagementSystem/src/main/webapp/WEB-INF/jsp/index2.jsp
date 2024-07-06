@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ include file="header.jsp" %>
+<%@ include file="header2.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -127,7 +127,7 @@
     <div class="btn-container">
       <button class="btn-get-started">GET STARTED</button>
       <div class="video-link">
-        <img src="/images/play.jpeg" alt="Video Icon">
+        <img src="/image/play.jpeg" alt="Video Icon">
         <span>Watch Video</span>
       </div>
     </div>

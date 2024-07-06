@@ -102,18 +102,9 @@
             <a href="/about" class="navbar-item">About</a>
         </div>
         <div class="navbar-item has-subnav">
-            Item
+            Slot Booking
             <div class="subnav">
-                <a href="/gymitem" class="subnav-item">Add Item</a>
-                <a href="/gymitems" class="subnav-item">View Items</a>
-            </div>
-        </div>
-        <div class="navbar-item has-subnav">
-            Slot
-            <div class="subnav">
-                <a href="/slotbooking" class="subnav-item">Slot Booking</a>
-                <a href="/slot" class="subnav-item">Add Slot</a>
-                <a href="/slots" class="subnav-item">View Slots</a>
+                <a href="/slots2" class="subnav-item">View Slots</a>
             </div>
         </div>
         <div class="navbar-item">Feedback</div>

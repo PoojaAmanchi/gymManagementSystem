@@ -13,8 +13,10 @@
  box-sizing: border-box;
 }
 body {
-background: url('/image/BGimg.jpeg') no-repeat center center fixed;
-background-size: cover;
+ background-size: cover;
+        	background-repeat: no-repeat;
+        	background-position: center center;
+        	background-attachment: fixed;
  display: flex;
  justify-content: center;
  align-items: center;
@@ -214,7 +216,7 @@ background-color: #eee;
 }
 </style>
 </head>
-<body>
+<body background="/images/BGimg.jpeg">
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('container');
@@ -258,10 +260,10 @@ function passwordCheck() {
             <input type="text" placeholder="FirstName" name="firstName" required/>
             <input type="text" placeholder="LastName" name="lastName" required />
             <input type="email" placeholder="Email" name="email" required/>
-            <select id="option" name="userType">
+            <select id="option" name="type">
                 <option value="" disabled selected>Select user type</option>
                 <option value="admin">Admin</option>
-                <option value="Customer">Member</option>
+                <option value="member">Member</option>
             </select>
             <input type="text" placeholder="Username" name="username" required/>
             <input type="password" placeholder="Password" id="pass1" name="password" required />
