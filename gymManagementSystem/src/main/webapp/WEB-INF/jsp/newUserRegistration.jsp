@@ -231,7 +231,7 @@ input {
 }
 </style>
 </head>
-<body background="/images/BGimg.jpg">
+<body background="/images/BGimg.jpeg">
 <script>
 document.addEventListener('DOMContentLoaded', () => {
  const container = document.getElementById('container');

@@ -225,7 +225,7 @@
         }
     </style>
 </head>
-<body background="/images/BGimg.jpg">
+<body background="/images/BGimg.jpeg">
     <div class="blur-overlay"></div>
     <div class="container" id="container">
         <div align="center" class="form-container sign-in-container">

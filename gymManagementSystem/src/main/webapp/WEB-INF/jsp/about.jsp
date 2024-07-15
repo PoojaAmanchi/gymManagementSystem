@@ -102,7 +102,7 @@
 <body>
 <div class="content">
   <div class="image-content">
-    <img src="/images/about.jpg" alt="Gym Image">
+    <img src="/images/about.jpeg" alt="Gym Image">
   </div>
   <div class="text-content">
     <h1>A Truly Epic Gym</h1>

@@ -117,7 +117,7 @@
 </head>
 <body>
 <div class="content">
-  <img src="/images/index.jpg" alt="Gym Image">
+  <img src="/images/index.jpeg" alt="Gym Image">
   <div class="text-content">
     <h1><span>GET HEALTHY BODY</span></h1>
     <h1><span>WITH THE PERFECT</span></h1>
@@ -126,7 +126,7 @@
     <div class="btn-container">
       <button class="btn-get-started">GET STARTED</button>
       <div class="video-link">
-        <img src="/images/play.jpg" alt="Video Icon">
+        <img src="/images/play.jpeg" alt="Video Icon">
         <span>Watch Video</span>
       </div>
     </div>
