@@ -31,7 +31,7 @@ public class LoginController {
   @PostMapping("/register")
   public ModelAndView saveUserRegisterPage(@Valid @ModelAttribute("userRecord") GymUser user, BindingResult result) {
       if (result.hasErrors()) {
-          return new ModelAndView("newUserRegistration", "formErrors", result.getAllErrors());
+          return new ModelAndView("NewUserRegistration", "formErrors", result.getAllErrors());
       }
       String encodedPassword = bcrypt.encode(user.getPassword());
       user.setPassword(encodedPassword);

@@ -93,7 +93,7 @@
 </head>
 <body>
 <div class="navbar">
-    <img src="/images/logo.jpeg" alt="Gym Logo">
+    <img src="/images/logo.jpg" alt="Gym Logo">
         <div>
         <div class="navbar-item">
             <a href="/index" class="navbar-item">Home</a>
@@ -105,6 +105,7 @@
             Slot Booking
             <div class="subnav">
                 <a href="/slots2" class="subnav-item">View Slots</a>
+                <a href="/booked"class="subnav-item">View Booking</a>
             </div>
         </div>
         <div class="navbar-item">Feedback</div>

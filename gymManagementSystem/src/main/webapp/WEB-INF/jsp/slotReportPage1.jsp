@@ -11,7 +11,7 @@
 <style>
     body {
         font-family: Arial, sans-serif;
-        background-image: url('/images/BGimg.jpeg');
+        background-image: url('/images/BGimg.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -118,7 +118,7 @@
                 <td>${slot.slotId}</td>
                 <td>${slot.slotTime}</td>
                 <td>${slot.pricing}</td>
-                <td><a href="/slot-show/${slot.slotId}">Slot Enquire</a></td>
+                <td><a href="/slot-book/${slot.slotId}">Slot Enquire</a></td>
                 <td>
                     <a href="#" class="delete-button" onclick="deleteSlot(${slot.slotId});">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">

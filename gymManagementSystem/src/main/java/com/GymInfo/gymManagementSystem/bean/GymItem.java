@@ -1,7 +1,6 @@
 package com.GymInfo.gymManagementSystem.bean;
 
 import javax.persistence.Entity;
-
 import javax.persistence.Id;
 import javax.persistence.Table;
 

@@ -7,9 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import com.GymInfo.gymManagementSystem.service.GymUserService;
-import com.GymInfo.gymManagementSystem.config.EncoderConfig;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.GymInfo.gymManagementSystem.service.GymUserService;
 
 @Configuration
 @EnableWebSecurity
