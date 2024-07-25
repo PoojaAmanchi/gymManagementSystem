@@ -37,14 +37,7 @@ public class SlotDaoImpl implements SlotDao {
             val = val + 1;
         return val;
     }
-    @Override
-    public void deleteSlotById(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-        } else {
-            throw new IllegalArgumentException("Slot with ID " + id + " not found");
-        }
-    }
+    
     @Override
     public void updateSlot(Slot slot) {
         if (repository.existsById(slot.getSlotId())) {
@@ -54,6 +47,3 @@ public class SlotDaoImpl implements SlotDao {
         }
     }
 }
-
-
-   

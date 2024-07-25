@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,6 +72,7 @@
 <div class="blur-overlay"></div>
 <div class="container">
     <h1 class="success">Booking Successful!</h1>
+    <br>
     <h1 class="info">Booking ID: ${gymbook.bookingId}</h1>
     <h1 class="info">Slot ID: ${gymbook.slotId}</h1>
     <h1 class="info">Item ID: ${gymbook.itemId}</h1>

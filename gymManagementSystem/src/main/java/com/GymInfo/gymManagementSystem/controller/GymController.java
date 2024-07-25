@@ -2,11 +2,8 @@ package com.GymInfo.gymManagementSystem.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,25 +11,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.Model;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import com.GymInfo.gymManagementSystem.bean.Feedback;
 import com.GymInfo.gymManagementSystem.bean.GymBook;
 import com.GymInfo.gymManagementSystem.bean.GymItem;
+import com.GymInfo.gymManagementSystem.bean.GymUser;
 import com.GymInfo.gymManagementSystem.bean.Item;
 import com.GymInfo.gymManagementSystem.bean.Slot;
 import com.GymInfo.gymManagementSystem.bean.SlotItem;
 import com.GymInfo.gymManagementSystem.bean.SlotItemEmbed;
+import com.GymInfo.gymManagementSystem.dao.FeedbackDao;
 import com.GymInfo.gymManagementSystem.dao.GymBookDao;
+import com.GymInfo.gymManagementSystem.dao.GymBookRepository;
 import com.GymInfo.gymManagementSystem.dao.GymItemDao;
 import com.GymInfo.gymManagementSystem.dao.SlotDao;
 import com.GymInfo.gymManagementSystem.dao.SlotItemDao;
+import com.GymInfo.gymManagementSystem.exception.DeleteUserException;
 import com.GymInfo.gymManagementSystem.exception.SeatNotAvailableException;
+import com.GymInfo.gymManagementSystem.exception.SlotAlreadyBookedException;
 import com.GymInfo.gymManagementSystem.service.GymItemService;
 import com.GymInfo.gymManagementSystem.service.GymUserService;
 
 @RestController
 public class GymController {
-	@Autowired
-    private GymItemDao gymItemService;
 	@Autowired
     private GymItemDao gymItemDao;
     @Autowired 
@@ -40,11 +43,24 @@ public class GymController {
     @Autowired 
     private SlotItemDao slotItemDao;
     @Autowired
+    private FeedbackDao feedbackDao;
+    @Autowired
     private GymItemService itemService;
     @Autowired
     private GymUserService userService;
     @Autowired
     private GymBookDao gymBookDao;
+    @Autowired
+    private GymBookRepository gymBookRepository;
+    
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            String currentUsername = authentication.getName(); 
+            model.addAttribute("username", currentUsername);
+        }
+    }
     
     @GetMapping("/index")
     public ModelAndView showIndexPage() {
@@ -76,11 +92,6 @@ public class GymController {
     public ModelAndView saveItem(@ModelAttribute("itemRecord") GymItem gymItem) {
         gymItemDao.saveNewItem(gymItem);
         return new ModelAndView("redirect:/index");
-        //return new ModelAndView("gymItemReportPage");
-        /*List<GymItem> itemList = gymItemDao.displayAllItems();
-        ModelAndView mv = new ModelAndView("gymItemReportPage");
-        mv.addObject("itemList", itemList);
-        return mv;*/
     }
 
     @GetMapping("/gymitems")
@@ -112,11 +123,6 @@ public class GymController {
         	slotItemDao.save(slotItem);
         }
         return new ModelAndView("redirect:/index");
-        //return new ModelAndView("slotReportPage1");
-        /*List<Slot> slotList = slotDao.displayAllSlots();
-        ModelAndView mv = new ModelAndView("slotReportPage1");
-        mv.addObject("slotList", slotList);
-        return mv;*/
     }
     
     @GetMapping("/slots")
@@ -135,14 +141,6 @@ public class GymController {
         return mv;
     }
     
-	 @DeleteMapping("/gymitem/{id}") public ResponseEntity<?>
-	 deleteItem(@PathVariable Long id) { try { gymItemService.deleteItemById(id);
-	 return ResponseEntity.ok().build(); } catch (IllegalArgumentException e) {
-	 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Item with ID " + id
-	 + " not found"); } catch (Exception e) { return
-	 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
-	 body("An error occurred: " + e.getMessage()); } 
-	 }
 	 
     @GetMapping("/gymitem/edit/{id}")
     public ModelAndView showEditItemPage(@PathVariable Long id) {
@@ -158,18 +156,6 @@ public class GymController {
         return new ModelAndView("redirect:/gymitems");
     }
     
-    @DeleteMapping("/slot/{id}")
-    public ResponseEntity<?> deleteSlot(@PathVariable Long id) {
-        try {
-            slotDao.deleteSlotById(id);
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Slot with ID " + id + " not found");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-        }
-    }
-    
     @GetMapping("/slot/edit/{id}")
     public ModelAndView showEditSlotPage(@PathVariable Long id) {
         Slot slot = slotDao.findSlotById(id);
@@ -183,16 +169,6 @@ public class GymController {
         slotDao.updateSlot(slot);
         return new ModelAndView("redirect:/slots");
     }
-    
-    /*@GetMapping("/slot-show/{id}")  
-    	public ModelAndView showSlotEnquirePage(@PathVariable Long id)  {
-    		Slot slot=slotDao.findSlotById(id);
-    		List<Item> itemList=itemService.getItemList(id);
-    		ModelAndView mv = new ModelAndView("slotBookPage");
-    		mv.addObject("slot",slot);
-    		mv.addObject("itemList",itemList);
-    		return mv;
-    }*/
     
     @GetMapping("/slot-book/{id}")  
 	public ModelAndView showSlotBookPage(@PathVariable Long id)  {
@@ -221,49 +197,49 @@ public class GymController {
     @PostMapping("/slot-book")
     public ModelAndView saveSlotbookPage(@RequestParam("slotId") Long slotId,@RequestParam("selectItem") Long itemId,@RequestParam("userId") String userId,@ModelAttribute("gymBookRecord") GymBook gymBook) {
     	String userType=userService.getType();
-    	String username="";
+    	String uname="";
         if (userId != null && !userId.isEmpty()) {
-        	if(userType.equalsIgnoreCase("Admin")) 
-        		username=userId;
-        	else if(userType.equalsIgnoreCase("Member"))
-        		username=userId;
+        	if(userType.equalsIgnoreCase("Member"))
+        		uname=userId;
+        	else if(userType.equalsIgnoreCase("Admin"))
+        		uname=userId;
         } 
         else {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            username = authentication.getName();
+        	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            uname = authentication.getName();
         }
-    	GymItem gymItem=gymItemDao.findItemById(itemId);
-    	SlotItemEmbed embed=new SlotItemEmbed(slotId, itemId);
-    	int totalSeat=gymItem.getTotalSeat();
-    	SlotItem slotItem=slotItemDao.findById(embed);
-    	int seatBooked=slotItemDao.findSeatBookedById(embed);
-    	int available=totalSeat-seatBooked;
-    	Long newId=gymBookDao.generateBookingId();
-    	gymBook.setBookingId(newId);
-    	gymBook.setSlotId(slotId);
-        gymBook.setItemId(itemId);
-        gymBook.setUsername(username);
-        gymBookDao.save(gymBook);
+        if(gymBookRepository.isSlotBooked(slotId,uname))
+           throw new SlotAlreadyBookedException();  
+        else
+        {
+        	GymItem gymItem=gymItemDao.findItemById(itemId);
+        	SlotItemEmbed embed=new SlotItemEmbed(slotId, itemId);
+        	int totalSeat=gymItem.getTotalSeat();
+        	SlotItem slotItem=slotItemDao.findById(embed);
+        	int seatBooked=slotItemDao.findSeatBookedById(embed);
+        	int available=totalSeat-seatBooked;
     	if (available>0) {
+        	Long newId=gymBookDao.generateBookingId();
+        	gymBook.setBookingId(newId);
+        	gymBook.setSlotId(slotId);
+            gymBook.setItemId(itemId);
+            gymBook.setUsername(uname);
+            gymBookDao.save(gymBook);
     		seatBooked++;
-    		slotItem.setseatBooked(seatBooked);
+    		slotItem.setSeatBooked(seatBooked);
     		slotItemDao.save(slotItem);
     		gymBookDao.save(gymBook);
+    		GymBook gymbook=gymBookDao.findBookInfoById(newId);
+        	ModelAndView mv=new ModelAndView("bookReportPage");
+    		mv.addObject("gymbook",gymbook);
+        	return mv;
     	}
     	else
-    		throw new SeatNotAvailableException();
-    	GymBook gymbook=gymBookDao.findBookInfoById(newId);
-    	String fname="";
-		if(userType.equalsIgnoreCase("Admin"))
-			fname="bookReportPage1";
-		else if(userType.equalsIgnoreCase("Member"))
-			fname="bookReportPage2";
-    	ModelAndView mv=new ModelAndView(fname);
-		mv.addObject("gymbook",gymbook);
-    	return mv;
+    		throw new SeatNotAvailableException("No seats available for booking!!");
+        }
     }
-    
-    @GetMapping("/slot-item-add/{id}")
+
+	@GetMapping("/slot-item-add/{id}")
     public ModelAndView saveItemSlots(@PathVariable Long id) {
     	itemService.addNewItemToSlots(id);
     	return new ModelAndView("redirect:/index");
@@ -277,7 +253,7 @@ public class GymController {
     	if(userType.equalsIgnoreCase("Member")) {
     		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             username = authentication.getName();
-            bookList=gymBookDao.getEntitiesByUsername(username);
+            bookList=gymBookDao.getBookingByUsername(username);
     	}
     	String fname="";
 		if(userType.equalsIgnoreCase("Admin"))
@@ -289,13 +265,12 @@ public class GymController {
     	return mv;
     }
      
-    /*
-    @PostMapping("/booked")
-    public ModelAndView cancelBooking(@RequestParam("slot_id") Long slotId,
-                                      @RequestParam("item_id") Long itemId,
+    @GetMapping("/cancel")
+    public ModelAndView cancelBooking(@RequestParam("slotId") Long slotId,
+                                      @RequestParam("itemId") Long itemId,
                                       @RequestParam("selectBookingId") Long bookingId) {
         SlotItemEmbed embed = new SlotItemEmbed(slotId, itemId);
-        SlotItem slotItem = slotItemDao.findItemById(embed);
+        SlotItem slotItem = slotItemDao.findById(embed);
         if (slotItem != null) {
             int seatBooked = slotItem.getSeatBooked();
             if (seatBooked > 0) {
@@ -308,5 +283,112 @@ public class GymController {
         ModelAndView mv = new ModelAndView("redirect:/index");
         return mv;
     }
-     */
+    
+    @GetMapping("/seaterror")
+    public ModelAndView showSeatErrorPage() {
+    	String fname="";
+		String userType=userService.getType();
+		if(userType.equalsIgnoreCase("Admin"))
+			fname="slotBookPage1";
+		else if(userType.equalsIgnoreCase("Member"))
+			fname="slotBookPage2";
+        ModelAndView mv = new ModelAndView(fname);
+        return mv;
+    }
+    
+    @GetMapping("/sloterror")
+    public ModelAndView showSlotErrorPage() {
+    	String fname="";
+		String userType=userService.getType();
+		if(userType.equalsIgnoreCase("Admin"))
+			fname="slotBookPage1";
+		else if(userType.equalsIgnoreCase("Member"))
+			fname="slotBookPage2";
+        ModelAndView mv = new ModelAndView(fname);
+        return mv;
+    }
+    
+    @GetMapping("/eslot")
+    public ModelAndView showEmptySlotPage() {
+    	List<SlotItem> slotList = slotItemDao.displayEmptySlots();
+        ModelAndView mv = new ModelAndView("emptySlotReportPage");
+        mv.addObject("slot_item", slotList);
+        return mv;
+    }
+    
+    @GetMapping("/bslot")
+    public ModelAndView showBookedSlotPage() {
+    	List<SlotItem> slotList = slotItemDao.displayBookedSlots();
+        ModelAndView mv = new ModelAndView("bookedSlotReportPage");
+        mv.addObject("slot_item", slotList);
+        return mv;
+    }
+    
+    @GetMapping("/profile/{username}")
+    public ModelAndView showProfilePage(@PathVariable String username) {
+    	GymUser user = userService.findByUsername(username);
+        ModelAndView mv = new ModelAndView("profilePage");
+        mv.addObject("user", user);
+        return mv;
+    }
+    
+    @GetMapping("/users")
+    public ModelAndView showUsersPage() {
+		String userType=userService.getType();
+		if(userType.equalsIgnoreCase("Admin"))
+		{
+    	List<GymUser> userList = userService.getAllUsers();
+        ModelAndView mv = new ModelAndView("userReportPage");
+        mv.addObject("users", userList);
+        return mv;
+		}
+		else
+			return new ModelAndView("redirect:/index");
+    }
+    
+	 @GetMapping("/users/{username}") 
+	 public ModelAndView deleteUser(@PathVariable String username) { 
+		 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		    String currentUsername = null;
+		    if (auth.getPrincipal() instanceof UserDetails) {
+		        currentUsername = ((UserDetails) auth.getPrincipal()).getUsername();
+		    } else {
+		        currentUsername = auth.getPrincipal().toString();
+		    }
+		    if (username.equals(currentUsername)) {
+		        throw new DeleteUserException("You cannot delete the currently logged-in user.");
+		    }
+			List<GymBook> book=gymBookDao.getBookingByUsername(username);
+		    	if(book.isEmpty()) {
+		        	userService.delete(username);
+		        	return new ModelAndView("redirect:/users");
+		    	}
+		    	else 
+		    		throw new DeleteUserException(username+" has booked slots. If you want to delete "+username+" then cancel the booking first");
+	 }
+    
+    @GetMapping("/feedback-report")
+    public ModelAndView showFeedbackReportPage() {
+    	List<Feedback> feedbackList = feedbackDao.displayAllFeedbacks();
+        ModelAndView mv = new ModelAndView("feedbackReportPage");
+        mv.addObject("feedback", feedbackList);
+        return mv;
+    }
+    
+    @GetMapping("/feedback")
+    public ModelAndView showFeedbackPage() {
+        return new ModelAndView("feedbackPage", "feedbackRecord", new Feedback());
+    }
+    
+    @PostMapping("/feedback")
+    public ModelAndView saveFeedback(@ModelAttribute("feedbackRecord") Feedback feedback) {
+    	feedback.setfId(feedbackDao.generateFeedbackId());  
+        feedbackDao.saveNewFeedback(feedback);
+        return new ModelAndView("redirect:/index");
+    }
+    
+    @GetMapping("/contactUs")
+    public ModelAndView showcontactUs() {
+        return new ModelAndView("contactUs");
+    }
 }

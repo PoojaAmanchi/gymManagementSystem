@@ -44,14 +44,6 @@ public class GymItemDaoImpl implements GymItemDao {
 	}
 
     @Override
-    public void deleteItemById(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id); 
-        } else {
-            throw new IllegalArgumentException("Item with ID " + id + " not found");
-        }
-    }
-    @Override
     public void updateItem(GymItem gymItem) {
         if (repository.existsById(gymItem.getItemId())) {
             repository.save(gymItem); 

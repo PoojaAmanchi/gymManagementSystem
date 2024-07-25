@@ -8,11 +8,10 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Book Slot</title>
+<title>Feedback</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        background-image: url('/images/BGimg.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -41,43 +40,13 @@
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        width: 50%;
+        width: 80%;
+        max-width: 500px;
         text-align: center;
     }
-    h1, h2, h3 {
-        margin: 10px 0;
-    }
-    h1 {
-        color: #C21807;
-    }
     h2 {
+        margin: 10px 0;
         color: #333;
-    }
-    h3 {
-        color: #666;
-    }
-    .table-container {
-        display: flex;
-        justify-content: center;
-    }
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        background-color: #fff;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        margin: 20px 0;
-    }
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-    th {
-        background-color: #C21807;
-        color: white;
-    }
-    tr:hover {
-        background-color: #f1f1f1;
     }
     button {
         padding: 10px 20px;
@@ -87,11 +56,11 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-    button.book {
+    button.submit {
         background-color: #C21807;
         color: white;
     }
-    button.book:hover {
+    button.submit:hover {
         background-color: #d43d23;
     }
     button.return {
@@ -122,57 +91,38 @@
         display: block;
         opacity: 1;
     }
-    .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 20px;
-        }
+    form label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
 </style>
-<!-- <script>
+<script>
 function showAlert() {
     var alertBox = document.getElementById('success-alert');
     alertBox.classList.add('show');
     setTimeout(function() {
         alertBox.classList.remove('show');
-    }, 15000);
+    }, 20000);
 }
-</script> -->
+</script>
 </head>
-<body>
-<c:url value="/slot-book" var="book"/>
+<body background="/images/BGimg.jpg">
+<c:url value="/feedback" var="submit"/>
 <div class="blur-overlay"></div>
 <div class="container">
-    <h3>Slot ID: ${slot.slotId}</h3>
-    <h2>Slot Time: ${slot.slotTime}</h2>
-    <h1>Price: ${slot.pricing}</h1>
-    <form:form id="booking_form" method="post" action="${book}">
-        <input type="hidden" value="${slot.slotId}" name="slotId"/>
-        <input type="hidden" value="${gym_user.username}" name="userId"/>
-        <div class="table-container">
-            <table border="1" cellspacing="3" cellpadding="3">
-                <tr>
-                    <th>Item No</th>
-                    <th>Item Name</th>
-                    <th>Total Seat</th>
-                    <th>Available Seat</th>
-                    <th>Select</th>
-                </tr>
-                <c:forEach items="${itemList}" var="item">
-                    <tr>
-                        <td>${item.itemId}</td>
-                        <td>${item.itemName}</td>
-                        <td>${item.totalSeat}</td>
-                        <td>${item.seatVacant }</td>
-                        <td><input name="selectItem" type="radio" value="${item.itemId}"/></td>
-                    </tr>
-                </c:forEach>
-            </table>
+    <h2>Feedback</h2>
+    <form:form id="feedback_form" method="post" action="${submit}" modelAttribute="feedbackRecord">
+        <label for="userName">Enter Name:</label>
+        <form:input path="userName" id="userName"/>
+        <label for="content">Enter Feedback:</label>
+        <form:textarea rows="5" cols="50" path="content" id="content"/>
+        <div>
+            <button type="submit" class="submit" onClick="showAlert();">Submit</button>
+            <button type="button" class="return" onclick="window.history.back();">Return</button>
         </div>
-        <br/>
-        <button type="submit" class="book" onClick="showAlert();">Book</button>
-        <button type="button" class="return" onclick="window.history.back();">Return</button>
     </form:form>
 </div>
-<!-- <div id="success-alert" class="alert-success">Booking Done Successfully!</div> -->
+<div id="success-alert" class="alert-success">Feedback submitted Successfully!</div> 
 </body>
 </html>

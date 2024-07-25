@@ -8,9 +8,9 @@
 <meta charset="ISO-8859-1">
 <title>Booked Slots</title>
 <style>
-   body {
+    body {
         font-family: Arial, sans-serif;
-        background-image: url('/images/BGimg.jpeg');
+        background-image: url('${pageContext.request.contextPath}/images/BGimg.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -57,6 +57,8 @@
     .table-container {
         display: flex;
         justify-content: center;
+        overflow-y: auto;
+        max-height: 400px;
     }
     table {
         border-collapse: collapse;
@@ -85,12 +87,13 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
-    button.book {
-        background-color: #C21807;
-        color: white;
+    button.cancel {
+        background-color: #f1f1f1;
+        padding: 5px 20px;
+        margin: 2px 10px;
     }
-    button.book:hover {
-        background-color: #d43d23;
+    button.cancel:hover {
+        background-color: #f1f1f1;
     }
     button.return {
         background-color: grey;
@@ -99,7 +102,63 @@
     button.return:hover {
         background-color: #5a5a5a;
     }
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 3;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .modal-buttons {
+        margin-top: 20px;
+    }
+    .modal-button {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .modal-button.yes {
+        background-color: #C21807;
+        color: white;
+    }
+    .modal-button.no {
+        background-color: grey;
+        color: white;
+    }
 </style>
+<script>
+    function showModal(slotId, itemId, bookingId) {
+        const modal = document.getElementById('confirmationModal');
+        const confirmButton = document.getElementById('confirmButton');
+        modal.style.display = 'block';
+
+        confirmButton.onclick = function() {
+            window.location.href = '/cancel?slotId=' + slotId + '&itemId=' + itemId + '&selectBookingId=' + bookingId;
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('confirmationModal');
+        modal.style.display = 'none';
+    }
+</script>
 </head>
 <body>
 <div class="blur-overlay"></div>
@@ -110,17 +169,31 @@
                 <th>Booking Id</th>
                 <th>Slot Id</th>
                 <th>Item Id</th>
+                <th>Cancel Booking</th>
             </tr>
             <c:forEach items="${bookList}" var="item">
                 <tr>
                     <td>${item.bookingId}</td>
                     <td>${item.slotId}</td>
                     <td>${item.itemId}</td>
+                    <td><button class="cancel" onclick="showModal('${item.slotId}', '${item.itemId}', '${item.bookingId}')">Cancel</button></td>
                 </tr>
             </c:forEach>
         </table>
     </div>
     <button class="return" onclick="window.location.href='/index'">Return</button>
+</div>
+
+<!-- The Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h2>Cancel Booking</h2>
+        <p>Are you sure you want to cancel this booking?</p>
+        <div class="modal-buttons">
+            <button id="confirmButton" class="modal-button yes">Yes</button>
+            <button onclick="closeModal()" class="modal-button no">No</button>
+        </div>
+    </div>
 </div>
 </body>
 </html>
