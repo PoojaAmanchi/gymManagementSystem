@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: gymManagementSystem
+    env: java
+    plan: free
+    buildCommand: ./mvnw clean install -DskipTests
+    startCommand: java -jar target/gymManagementSystem-0.0.1-SNAPSHOT.war
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        value: jdbc:mysql://localhost:3306/GymDB  # Replace with your database URL or let Render sync this variable if using Render’s managed database
+      - key: SPRING_DATASOURCE_USERNAME
+        value: root # Replace with your database username
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: Poojajourney@2004 # Replace with your database password
